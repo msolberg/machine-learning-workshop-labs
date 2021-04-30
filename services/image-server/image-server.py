@@ -17,7 +17,7 @@ db_user = os.getenv('database-user', 'xraylab')
 db_password = os.getenv('database-password', 'xraylab')
 db_host = os.getenv('database-host', 'xraylabdb')
 db_db = os.getenv('database-db', 'xraylabdb')
-service_point = service_point = os.getenv('service_point', 'http://ceph-nano/')
+service_point = service_point = os.getenv('service_point', 'http://ceph-nano-0/')
 
 # Bucket base name
 bucket_base_name = os.getenv('bucket-base-name', 'images')

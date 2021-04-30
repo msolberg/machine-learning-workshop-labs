@@ -23,7 +23,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 # Object storage
 access_key = os.getenv('AWS_ACCESS_KEY_ID', None)
 secret_key = os.getenv('AWS_SECRET_ACCESS_KEY', None)
-service_point = os.getenv('service_point', 'http://ceph-nano')
+service_point = os.getenv('service_point', 'http://ceph-nano-0/')
 s3client = boto3.client('s3','us-east-1', endpoint_url=service_point,
                        aws_access_key_id = access_key,
                        aws_secret_access_key = secret_key,
