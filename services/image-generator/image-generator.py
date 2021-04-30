@@ -10,6 +10,10 @@ import requests
 from botocore import UNSIGNED
 from botocore.client import Config
 
+from kafka import KafkaProducer
+import json
+
+
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 ##############
@@ -38,7 +42,11 @@ db_host = os.getenv('DATABASE_HOST', 'xraylabdb')
 db_db = os.getenv('DATABASE_DB', 'xraylabdb')
 
 # Delay between images
-seconds_wait = float(os.getenv('SECONDS_WAIT', 60))
+seconds_wait = float(os.getenv('SECONDS_WAIT', 2))
+
+# Kakfa producer
+producer = KafkaProducer(bootstrap_servers='my-cluster-kafka-bootstrap.user2-notebooks.svc:9092',
+                         value_serializer=lambda v: json.dumps(v).encode('utf-8'))
 
 ########
 # Code #
@@ -54,6 +62,18 @@ def copy_file(source, image_key, destination, image_name):
 
     s3client.upload_fileobj(file_object_from_req,destination,image_name)
 
+def send_event(destination, image_name):
+    """Sends an SMS event to the Kafka broker"""
+    
+    record = {'eventName': 's3:ObjectCreated',
+              's3': {'bucket': {'name': destination},
+                     'object': {'key': image_name}
+                    }
+             }
+    logging.info("sending %s"% record)
+    
+    producer.send('xray-images', {'Records': [record]})
+    
 def update_images_uploaded(image_name):
     """Inserts image name and timestamp into the helper database."""
 
@@ -90,6 +110,7 @@ while seconds_wait != 0: #This allows the container to keep running but not send
         image_key = pneumonia_images[random.randint(0,len(pneumonia_images)-1)]
     image_name = image_key.split('/')[-1]
     copy_file(bucket_source,image_key,bucket_destination,image_name)
+    send_event(bucket_destination,image_name)
     update_images_uploaded(image_name)
     sleep(seconds_wait)
 
