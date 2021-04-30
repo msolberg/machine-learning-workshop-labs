@@ -16,9 +16,9 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 ## Vars init #
 ##############
 # Object storage
-access_key = os.environ['AWS_ACCESS_KEY_ID']
-secret_key = os.environ['AWS_SECRET_ACCESS_KEY']
-service_point = os.environ['SERVICE_POINT']
+access_key = os.getenv('AWS_ACCESS_KEY_ID', None)
+secret_key = os.getenv('AWS_SECRET_ACCESS_KEY', None)
+service_point = os.getenv('SERVICE_POINT', 'http://ceph-nano/')
 s3client = boto3.client('s3', 'us-east-1', endpoint_url=service_point,
                         aws_access_key_id=access_key,
                         aws_secret_access_key=secret_key,
@@ -27,18 +27,18 @@ s3client = boto3.client('s3', 'us-east-1', endpoint_url=service_point,
 s3sourceclient = boto3.client('s3', config=Config(signature_version=UNSIGNED))
 
 # Buckets
-bucket_source = os.environ['BUCKET_SOURCE']
+bucket_source = os.getenv('BUCKET_SOURCE', 'https://s3.us-east-1.amazonaws.com/com.redhat.csds.guimou.xray-source')
 bucket_source_name = bucket_source.split('/')[-1]
-bucket_destination = os.environ['BUCKET_BASE_NAME']
+bucket_destination = os.getenv('BUCKET_BASE_NAME', 'images')
 
 # Helper database
-db_user = os.environ['DATABASE_USER']
-db_password = os.environ['DATABASE_PASSWORD']
-db_host = os.environ['DATABASE_HOST']
-db_db = os.environ['DATABASE_DB']
+db_user = os.getenv('DATABASE_USER', 'xraylab')
+db_password = os.getenv('DATABASE_PASSWORD', 'xraylab')
+db_host = os.getenv('DATABASE_HOST', 'xraylabdb')
+db_db = os.getenv('DATABASE_DB', 'xraylabdb')
 
 # Delay between images
-seconds_wait = float(os.environ['SECONDS_WAIT'])
+seconds_wait = float(os.getenv('SECONDS_WAIT', 60))
 
 ########
 # Code #
