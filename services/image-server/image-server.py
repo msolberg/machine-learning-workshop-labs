@@ -13,14 +13,14 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 ## Vars init #
 ##############
 # Helper database
-db_user = os.environ['database-user']
-db_password = os.environ['database-password']
-db_host = os.environ['database-host']
-db_db = os.environ['database-db']
-service_point = service_point = os.environ['service_point']
+db_user = os.getenv('database-user', 'xraylab')
+db_password = os.getenv('database-password', 'xraylab')
+db_host = os.getenv('database-host', 'xraylabdb')
+db_db = os.getenv('database-db', 'xraylabdb')
+service_point = service_point = os.getenv('service_point', 'http://ceph-nano/')
 
 # Bucket base name
-bucket_base_name = os.environ['bucket-base-name']
+bucket_base_name = os.getenv('bucket-base-name', 'images')
 
 ########
 # Code #
