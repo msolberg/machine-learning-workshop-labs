@@ -21,25 +21,25 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 ## Vars init #
 ##############
 # Object storage
-access_key = os.environ['AWS_ACCESS_KEY_ID']
-secret_key = os.environ['AWS_SECRET_ACCESS_KEY']
-service_point = os.environ['service_point']
+access_key = os.getenv('AWS_ACCESS_KEY_ID', None)
+secret_key = os.getenv('AWS_SECRET_ACCESS_KEY', None)
+service_point = os.getenv('service_point', 'http://ceph-nano')
 s3client = boto3.client('s3','us-east-1', endpoint_url=service_point,
                        aws_access_key_id = access_key,
                        aws_secret_access_key = secret_key,
                         use_ssl = True if 'https' in service_point else False)
 
 # Bucket base name
-bucket_base_name = os.environ['bucket-base-name']
+bucket_base_name = os.getenv('bucket-base-name', 'images')
 
 # Helper database
-db_user = os.environ['database-user']
-db_password = os.environ['database-password']
-db_host = os.environ['database-host']
-db_db = os.environ['database-db']
+db_user = os.getenv('database-user', 'xraylab')
+db_password = os.getenv('database-password', 'xraylab')
+db_host = os.getenv('database-host', 'xraylabdb')
+db_db = os.getenv('database-db', 'xraylabdb')
 
 # Inference model version
-model_version = os.environ['model_version']
+model_version = os.getenv('model_version', '1')
 
 ########
 # Code #
