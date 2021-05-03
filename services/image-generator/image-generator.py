@@ -45,7 +45,7 @@ db_db = os.getenv('DATABASE_DB', 'xraylabdb')
 seconds_wait = float(os.getenv('SECONDS_WAIT', 2))
 
 # Kakfa producer
-producer = KafkaProducer(bootstrap_servers='my-cluster-kafka-bootstrap.user2-notebooks.svc:9092',
+producer = KafkaProducer(bootstrap_servers='my-cluster-kafka-bootstrap:9092',
                          value_serializer=lambda v: json.dumps(v).encode('utf-8'))
 
 ########
