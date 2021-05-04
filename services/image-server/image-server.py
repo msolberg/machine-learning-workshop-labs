@@ -3,9 +3,12 @@ import os
 import sys
 from string import Template
 
+import flask
 from flask import Flask
 from flask_cors import CORS
 import mysql.connector
+
+import requests
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
@@ -17,7 +20,7 @@ db_user = os.getenv('database-user', 'xraylab')
 db_password = os.getenv('database-password', 'xraylab')
 db_host = os.getenv('database-host', 'xraylabdb')
 db_db = os.getenv('database-db', 'xraylabdb')
-service_point = service_point = os.getenv('service_point', 'http://ceph-nano-0/')
+service_point = os.getenv('service_point', 'http://ceph-nano-0/')
 
 # Bucket base name
 bucket_base_name = os.getenv('bucket-base-name', 'images')
@@ -53,10 +56,10 @@ def get_last_image(bucket_name):
 
 # Response templates 
 LOCATION_TEMPLATE_SMALL = Template("""
-    <img src="${service_point}/${bucket_name}/${image_name}" style="width:260px;"></img>""")
+    <img src="/download_image/${bucket_name}/${image_name}" style="width:260px;"></img>""")
 
 LOCATION_TEMPLATE_BIG = Template("""
-    <img src="${service_point}/${bucket_name}/${image_name}" style="width:575px;"></img>""")
+    <img src="/download_image/${bucket_name}/${image_name}" style="width:575px;"></img>""")
 
 # Main Flask app
 app = Flask(__name__)
@@ -72,7 +75,7 @@ def homepage():
 def last_image_small(bucket_name):
     image_name = get_last_image(bucket_name)
     if image_name != "":   
-        html = LOCATION_TEMPLATE_SMALL.substitute(service_point=service_point, bucket_name=bucket_name, image_name=image_name)
+        html = LOCATION_TEMPLATE_SMALL.substitute(bucket_name=bucket_name, image_name=image_name)
     else:
         html = '<h2 style="font-family: Roboto,Helvetica Neue,Arial,sans-serif;text-align: center; color: white;font-size: 15px;font-weight: 400;">No image to show</h2>'
     return html
@@ -82,10 +85,15 @@ def last_image_small(bucket_name):
 def last_image_big(bucket_name):
     image_name = get_last_image(bucket_name)   
     if image_name != "":   
-        html = LOCATION_TEMPLATE_BIG.substitute(service_point=service_point, bucket_name=bucket_name, image_name=image_name)
+        html = LOCATION_TEMPLATE_BIG.substitute(bucket_name=bucket_name, image_name=image_name)
     else:
         html = '<h2 style="font-family: Roboto,Helvetica Neue,Arial,sans-serif;text-align: center; color: white;font-size: 15px;font-weight: 400;">No image to show</h2>'
     return html
+
+@app.route('/download_image/<bucket_name>/<image_name>')
+def download_image(bucket_name, image_name):
+    fp = requests.get('http://%s/%s/%s'% (service_point, bucket_name, image_name), stream=True)
+    return flask.send_file(fp.raw, mimetype='image/jpeg')
 
 # Launch Flask server
 if __name__ == '__main__':
