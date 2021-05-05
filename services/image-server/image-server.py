@@ -63,6 +63,22 @@ def get_last_image(bucket_name):
     return result
 
 # Response templates 
+HOME_TEMPLATE = Template("""
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>X-Ray Images</h1>
+<h2>Last Uploaded Image</h2>
+${last_uploaded}
+<h2>Last Proccessed Image</h2>
+${last_processed}
+<h2>Last Anonymized Image</h2>
+${last_anonymized}
+</body>
+</html>
+""")
+
 LOCATION_TEMPLATE_SMALL = Template("""
     <img src="/download_image/${bucket_name}/${image_name}" style="width:260px;"></img>""")
 
@@ -76,7 +92,11 @@ CORS(app)
 # Test route
 @app.route('/')
 def homepage():
-    return "Hello world"
+    html = HOME_TEMPLATE.substitute(last_uploaded=last_image_small('images'),
+                                    last_processed=last_image_small('images-processed'),
+                                    last_anonymized=last_image_small('images-anonymized'))
+    
+    return html
 
 # Answers with last image from <bucketname>, formatted as small
 @app.route('/last_image_small/<bucket_name>')
