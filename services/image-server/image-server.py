@@ -8,7 +8,7 @@ from flask import Flask
 from flask_cors import CORS
 import mysql.connector
 
-import requests
+import boto3
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
@@ -20,7 +20,15 @@ db_user = os.getenv('database-user', 'xraylab')
 db_password = os.getenv('database-password', 'xraylab')
 db_host = os.getenv('database-host', 'xraylabdb')
 db_db = os.getenv('database-db', 'xraylabdb')
-service_point = os.getenv('service_point', 'http://ceph-nano-0/')
+
+# S3 Endpoint
+access_key = os.getenv('AWS_ACCESS_KEY_ID', None)
+secret_key = os.getenv('AWS_SECRET_ACCESS_KEY', None)
+service_point = os.getenv('SERVICE_POINT', 'http://ceph-nano-0/')
+s3client = boto3.client('s3', 'us-east-1', endpoint_url=service_point,
+                        aws_access_key_id=access_key,
+                        aws_secret_access_key=secret_key,
+                        use_ssl=True if 'https' in service_point else False)
 
 # Bucket base name
 bucket_base_name = os.getenv('bucket-base-name', 'images')
@@ -90,10 +98,15 @@ def last_image_big(bucket_name):
         html = '<h2 style="font-family: Roboto,Helvetica Neue,Arial,sans-serif;text-align: center; color: white;font-size: 15px;font-weight: 400;">No image to show</h2>'
     return html
 
+# Download an image from an S3 bucket and send it back to the browser.
 @app.route('/download_image/<bucket_name>/<image_name>')
 def download_image(bucket_name, image_name):
-    fp = requests.get('http://%s/%s/%s'% (service_point, bucket_name, image_name), stream=True)
-    return flask.send_file(fp.raw, mimetype='image/jpeg')
+    logging.info("Request: bucket_name, %s; image_name, %s"% (bucket_name, image_name))
+    obj = s3client.get_object(Bucket=bucket_name, Key=image_name)
+
+    response = flask.Response(mimetype='image/jpeg')
+    response.data = obj['Body'].read()
+    return response
 
 # Launch Flask server
 if __name__ == '__main__':
