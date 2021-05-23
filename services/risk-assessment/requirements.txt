@@ -1,4 +1,4 @@
-tensorflow==2.5.*
+tensorflow==2.4.*
 boto3==1.17.*
 pillow==7.2.*
 cloudevents==1.2.*
