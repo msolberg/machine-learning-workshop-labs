@@ -1,4 +1,4 @@
-FROM quay.io/bitnami/python:3.7
+FROM quay.io/oatakan/nvidia-cuda-tensorflow:latest
 
 WORKDIR /usr/src/app
 
