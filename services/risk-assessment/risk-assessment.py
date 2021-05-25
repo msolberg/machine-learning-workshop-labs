@@ -15,7 +15,12 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 import mysql.connector
 from flask_cors import CORS
 
+gpus = tf.config.experimental.list_physical_devices('GPU')
+for gpu in gpus:
+  tf.config.experimental.set_memory_growth(gpu, True)
+
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+logging.info('Num GPUs Available: ' +  str(len(tf.config.list_physical_devices('GPU'))))
 
 ##############
 ## Vars init #
@@ -40,6 +45,10 @@ db_db = os.getenv('database-db', 'xraylabdb')
 
 # Inference model version
 model_version = os.getenv('model_version', '1')
+
+# Load the model
+model = tf.keras.models.load_model('./pneumonia_model.h5')
+logging.info('model loaded')
 
 ########
 # Code #
@@ -143,8 +152,6 @@ def load_image(bucket_name, img_path):
 def prediction(new_image):
     logging.info('prediction')
     try:
-        model = tf.keras.models.load_model('./pneumonia_model.h5')
-        logging.info('model loaded')
         pred = model.predict(new_image)
         logging.info('prediction made')
     

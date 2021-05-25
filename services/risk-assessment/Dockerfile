@@ -1,4 +1,4 @@
-FROM quay.io/oatakan/nvidia-cuda-tensorflow:latest
+FROM nvcr.io/nvidia/tensorflow:21.05-tf2-py3
 
 WORKDIR /usr/src/app
 
