@@ -142,7 +142,7 @@ def load_image(bucket_name, img_path):
     obj = s3client.get_object(Bucket=bucket_name, Key=img_path)
     img = Image.open(io.BytesIO(obj['Body'].read()))
     img = img.convert('RGB')
-    img = img.resize((150, 150), Image.NEAREST)
+    img = img.resize((50, 50), Image.NEAREST)
     img_tensor = tf.keras.preprocessing.image.img_to_array(img)                    # (height, width, channels)
     img_tensor = np.expand_dims(img_tensor, axis=0)         # (1, height, width, channels), add a dimension because the model expects this shape: (batch_size, height, width, channels)
     img_tensor /= 255.                                      # imshow expects values in the range [0, 1]
