@@ -136,6 +136,7 @@ def extract_data(data):
     return data_out
 
 def load_image(bucket_name, img_path):
+    local_path = "/tmp/%s"% (img_path,)
     logging.info('load_image')
     logging.info(bucket_name)
     logging.info(img_path)
